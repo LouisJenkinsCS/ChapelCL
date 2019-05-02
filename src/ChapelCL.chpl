@@ -63,12 +63,15 @@ module OpenCL {
 
     proc createScalar(name : string, dtype : GPUVariableType) : GPUScalar {
       scalars.push_back(new owned GPUScalar(name, dtype));
+      writeln(scalars[scalarDom.high].borrow(), ";");
       return scalars[scalarDom.high].borrow();
     }
 
     proc createArray(name : string, dtype : GPUVariableType, size) : GPUArray {
       arrays.push_back(new owned GPUArray(name, dtype, size));
-      return arrays[arrayDom.high].borrow();
+      var arr = arrays[arrayDom.high].borrow();
+      writeln(arr, " = malloc(sizeof(", variableTypeToString(arr.dtype), ") * ", arr.size.name, ");");
+      return arr;
     }
   }
 
@@ -86,16 +89,6 @@ module OpenCL {
       this.dtype = dtype;
     }
     
-    proc init(other : GPUScalar) {
-      this.complete();
-      if this.name != nil {
-        writeln(this.name, " = ", other.name, ";");
-      } else {
-        this.name = other.name;
-        this.dtype = other.dtype;
-      } 
-    }
-
     proc readWriteThis(f) {
       f <~> variableTypeToString(dtype) <~> new ioLiteral(" ") <~> name;
     }
@@ -138,6 +131,7 @@ module OpenCL {
       this.idx = new owned GPUScalar(name="__idx__", dtype = GPUVariableType.INT);
       this.elem = new owned GPUScalar(name + "[" + this.idx.name + "]", dtype);
       this.size = new owned GPUScalar(name + "__size", dtype = GPUVariableType.INT);
+      writeln(this.size, ";");
       // Emit value
       this.size = size;
     }
@@ -154,8 +148,8 @@ module OpenCL {
       f <~> variableTypeToString(dtype) <~> new ioLiteral("* ") <~> name;
     }
 
-    iter these(rng : range) {
-      writeln("for(", this.idx, " = ", rng.low, "; ", this.idx.name, " < ", rng.high, "; ", this.idx.name, "++) {");
+    iter these() {
+      writeln("for(", this.idx, " = ", 0, "; ", this.idx.name, " < ", this.size.name, "; ", this.idx.name, "++) {");
       yield elem;
       writeln("}");
     } 
@@ -169,6 +163,9 @@ module OpenCL {
     var kernel = new GPUKernel();
     var x = kernel.createScalar("x", GPUVariableType.INT);
     var arr = kernel.createArray("arr", GPUVariableType.INT, 10);
-    for a in arr.these(0..#10) do a += 1;
+    for a in arr { 
+      a += 1;
+      x += a;
+    }
   }
 }
