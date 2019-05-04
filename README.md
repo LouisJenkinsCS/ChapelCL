@@ -1,4 +1,4 @@
-ChapelCL
+ChapelCL WIP
 ========
 
 OpenCL Wrapper for Chapel
@@ -17,6 +17,8 @@ __kernel void vector_add(__global const int *A, __global const int *B, __global 
     C[i] = A[i] + B[i];
 }
 ```
+
+**No language/compiler changes needed, just OpenCL!**
 
 ![](screenshots/info4.png)
 ![](screenshots/info3.png)
