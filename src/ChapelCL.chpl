@@ -104,16 +104,20 @@ module OpenCL {
     return x;
   }
 
-  proc +=(x : GPUScalar, y : integral) {
+  proc +=(ref x : GPUScalar, y : integral) {
     writeln(x.name, " += ", y);
   }
 
-  proc +=(x : GPUScalar, y : GPUScalar) {
+  proc +=(ref x : GPUScalar, y : GPUScalar) {
     writeln(x.name, " += ", y.name);
   }
 
-  proc =(x : GPUScalar, y : integral) {
+  proc =(ref x : GPUScalar, y) {
     writeln(x.name, " = ", y, ";");
+  }
+
+  proc =(ref x : GPUScalar, ref y : GPUScalar) {
+    writeln(x.name, " = ", y.name, ";");
   }
   
   // Represents an array of scalars. The array holds a single symbolic
@@ -148,7 +152,7 @@ module OpenCL {
       f <~> variableTypeToString(dtype) <~> new ioLiteral("* ") <~> name;
     }
 
-    iter these() {
+    iter these() ref {
       writeln("for(", this.idx, " = ", 0, "; ", this.idx.name, " < ", this.size.name, "; ", this.idx.name, "++) {");
       yield elem;
       writeln("}");
