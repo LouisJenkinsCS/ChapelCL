@@ -27,13 +27,13 @@ class ASTNode {
 }
 
 // Example: "x = 1 + 2"
-class Decl : ASTNode {
+class Assignment : ASTNode {
   var lhs : unmanaged Name;
   var rhs : unmanaged ASTNode;
   var op : string;
 
   proc init(lhs :unmanaged Name, rhs : unmanaged ASTNode, op : string = "=") {
-    assert(lhs.hasContext(), "Decl statement missing context for ", lhs);
+    assert(lhs.hasContext(), "Assignment statement missing context for ", lhs);
     this.context = lhs.context;
     this.lhs = lhs;
     this.rhs = rhs;
@@ -48,6 +48,8 @@ class Decl : ASTNode {
 
   proc readWriteThis(f) { f <~> lhs <~> " " + op + " " <~> rhs <~> ";"; }
 }
+
+// Example: 
 
 // Example: "!x"
 class UnaryOp : ASTNode {
@@ -152,11 +154,11 @@ proc -(x : unmanaged ASTNode, y) where isASTNodeConstantType(y.type) {
 }
 
 proc =(ref x : unmanaged Name, y : unmanaged ASTNode) {
-  new unmanaged Decl(x, y);
+  new unmanaged Assignment(x, y);
 }
 
 proc =(ref x : unmanaged Name, y) where isASTNodeConstantType(y.type) {
-  new unmanaged Decl(x, new unmanaged Constant(y));
+  new unmanaged Assignment(x, new unmanaged Constant(y));
 }
 
 proc main() {
