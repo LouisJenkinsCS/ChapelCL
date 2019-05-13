@@ -7,7 +7,7 @@ class ASTContext {
   }
 
   proc readWriteThis(f) {
-    f <~> "ASTContext{\nname=" + name + "\n" <~> roots <~> "\n}";
+    f <~> "ASTContext{\nname=" + name + "\n" <~> for r in roots do r : string + "\n" <~> "\n}";
   }
 }
 

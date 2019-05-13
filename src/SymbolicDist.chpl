@@ -116,11 +116,10 @@ class SymbolicArr : BaseArr {
     this.eltType = eltType;
     this.name = "__arr" + numInstances.fetchAdd(1) + "__";
     this.dom = dom;
-    this.syms = c_malloc(unmanaged Name, dom.inds.size + 1);
+    this.syms = c_malloc(unmanaged Name, dom.inds.size);
     for idx in 0..#dom.inds.size {
       this.syms[idx] = new unmanaged Name(this.name + "[" + idx + "]", dom.dist.context);
     }
-    this.syms[dom.inds.size] = new unmanaged Name(this.name + "[__INDEX__]", dom.dist.context);
   }
 
   proc dsiGetBaseDom() return dom;
@@ -140,6 +139,7 @@ class SymbolicArr : BaseArr {
   }
   
   iter these() {
+    yield syms[dom.inds.size];
     // TODO: First add an AST node to context that indicates we are in a 'for' loop from 'lo' to 'hi'
     // Then create a new 'Name' that will represent the loop variable at the symbolic 'index'
     // Then close the current loop.
